@@ -961,9 +961,21 @@ def _check_positions(event: Event, now_dt: datetime, time_machine_now_dt: dateti
         raise OrderError(err)
 
 
+def _summarize_fee_keys(fee_data):
+    summaries = []
+    if not fee_data:
+        return summaries
+    keys = list(fee_data.keys())
+    for k in keys:
+        if k in list(fee_data.keys()):
+            summaries.append(f"{k}:{fee_data[k]}")
+    return summaries
+
+
 def _apply_rounding_and_fees(positions: List[CartPosition], payment_requests: List[dict], address: InvoiceAddress,
                              meta_info: dict, event: Event, sales_channel: SalesChannel, require_approval=False):
     fees = []
+    _summarize_fee_keys(meta_info or {})
     # Pre-rounding, pre-fee total is used for fee calculation
     total = sum([c.gross_price_before_rounding for c in positions])
 
