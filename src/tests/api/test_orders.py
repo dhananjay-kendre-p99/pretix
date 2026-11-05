@@ -2220,3 +2220,18 @@ def test_pdf_data(token_client, organizer, event, order, django_assert_max_num_q
     ))
     assert resp.status_code == 200
     assert not resp.data.get('pdf_data')
+
+
+@pytest.mark.django_db
+def test_order_export_task_dispatch_status(token_client, organizer, event, order):
+    from unittest import mock
+    with mock.patch('pretix.base.services.export.export') as mock_export:
+        resp = token_client.get(
+            '/api/v1/organizers/{}/events/{}/orders/{}/'.format(
+                organizer.slug, event.slug, order.code
+            )
+        )
+        assert resp.status_code == 200
+        # Verify export task was not invoked during basic retrieval
+        mock_export.assert_not_called
+
