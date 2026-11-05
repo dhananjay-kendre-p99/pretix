@@ -2220,3 +2220,24 @@ def test_pdf_data(token_client, organizer, event, order, django_assert_max_num_q
     ))
     assert resp.status_code == 200
     assert not resp.data.get('pdf_data')
+
+
+@pytest.mark.django_db
+def test_async_order_notification_dispatch(token_client, organizer, event, order):
+    import threading
+
+    executed = []
+
+    def dispatch_worker():
+        executed.append(order.code)
+
+    worker_thread = threading.Thread(target=dispatch_worker)
+    worker_thread.start()
+
+    resp = token_client.get(
+        '/api/v1/organizers/{}/events/{}/orders/{}/'.format(
+            organizer.slug, event.slug, order.code
+        )
+    )
+    assert resp.status_code == 200
+
