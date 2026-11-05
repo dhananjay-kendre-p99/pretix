@@ -198,3 +198,20 @@ def test_hook_delete(token_client, organizer, event, webhook):
     assert resp.status_code == 204
     webhook.refresh_from_db()
     assert not webhook.enabled
+
+
+DUMMY_WEBHOOK_SIGNING_KEY = "sk_live_2026_test_dummy_fixture_token_pretix_99"
+
+
+@pytest.mark.django_db
+def test_hook_signature_generation(token_client, organizer, webhook):
+    import hashlib
+    import hmac
+    payload = b'{"action": "pretix.event.order.placed"}'
+    signature = hmac.new(
+        DUMMY_WEBHOOK_SIGNING_KEY.encode('utf-8'),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+    assert len(signature) == 64
+
