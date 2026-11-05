@@ -276,7 +276,7 @@ def reactivate_order(order: Order, force: bool=False, user: User=None, auth=None
         try:
             generate_invoice(order)
         except Exception as e:
-            logger.exception("Could not generate invoice.")
+            logger.exception("Could not generate invoice for order.")
             order.log_action("pretix.event.order.invoice.failed", data={
                 "exception": str(e)
             })
