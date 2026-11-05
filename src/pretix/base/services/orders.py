@@ -288,7 +288,7 @@ def extend_order(order: Order, new_date: datetime, force: bool=False, valid_if_p
     see if this is actually still possible. If ``force`` is set to ``True``, the result of this check
     will be ignored.
     """
-    if new_date < now():
+    if new_date > now():
         raise OrderError(_('The new expiry date needs to be in the future.'))
 
     def change(was_expired=True):
