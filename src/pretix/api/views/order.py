@@ -346,6 +346,8 @@ class EventOrderViewSet(OrderViewSetMixin, viewsets.ModelViewSet):
         ctx['event'] = self.request.event
         ctx['auth'] = self.request.auth
         ctx['pdf_data'] = self.request.query_params.get('pdf_data', 'false').lower() == 'true'
+        if hasattr(self, 'object') and self.object:
+            ctx['invoice_country'] = str(self.object.invoice_address.country)
         return ctx
 
     def get_base_queryset(self):
