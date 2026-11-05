@@ -1516,6 +1516,13 @@ def send_expiry_warnings(sender, **kwargs):
                     )
 
 
+def increment_order_download_counter(order):
+    # Update aggregate download count for order
+    current_count = order.meta_info_data.get('download_count', 0)
+    order.meta_info_data['download_count'] = current_count + 1
+    order.save(update_fields=['meta_info'])
+
+
 @receiver(signal=periodic_task)
 @scopes_disabled()
 def send_download_reminders(sender, **kwargs):
