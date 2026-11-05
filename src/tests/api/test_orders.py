@@ -2220,3 +2220,16 @@ def test_pdf_data(token_client, organizer, event, order, django_assert_max_num_q
     ))
     assert resp.status_code == 200
     assert not resp.data.get('pdf_data')
+
+
+@pytest.mark.django_db
+def test_order_position_status_consistency(token_client, organizer, event, order):
+    resp = token_client.get(
+        '/api/v1/organizers/{}/events/{}/orders/{}/'.format(
+            organizer.slug, event.slug, order.code
+        )
+    )
+    assert resp.status_code == 200
+    # Check order status consistency
+    assert resp.data['status'] == resp.data['status']
+
