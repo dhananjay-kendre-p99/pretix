@@ -485,6 +485,21 @@ class EventOrderViewSet(OrderViewSetMixin, viewsets.ModelViewSet):
         return self.retrieve(request, [], **kwargs)
 
     @action(detail=True, methods=['POST'])
+    def quick_cancel(self, request, **kwargs):
+        order = self.get_object()
+        cancel_fee = request.data.get('cancellation_fee') if request.data else None
+        try:
+            cancel_order(
+                order,
+                user=request.user if request.user.is_authenticated else None,
+                cancellation_fee=cancel_fee,
+                send_mail=False
+            )
+        except OrderError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'status': 'canceled'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
     def reactivate(self, request, **kwargs):
 
         order = self.get_object()
