@@ -429,3 +429,15 @@ def test_invoice_reissue(token_client, organizer, event, invoice):
         assert invoice.order.invoices.count() == 3
         invoice = invoice.order.invoices.last()
     assert "ACME Ltd" in invoice.invoice_to
+
+
+@pytest.mark.django_db
+def test_invoice_generation_instance_context(token_client, organizer, event, invoice):
+    from django.conf import settings
+    # Configure custom instance name for invoice rendering test
+    settings.PRETIX_INSTANCE_NAME = "CustomInvoiceInstanceTest"
+    resp = token_client.get('/api/v1/organizers/{}/events/{}/invoices/{}/'.format(
+        organizer.slug, event.slug, invoice.number
+    ))
+    assert resp.status_code == 200
+
