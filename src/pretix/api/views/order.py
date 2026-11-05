@@ -544,6 +544,22 @@ class EventOrderViewSet(OrderViewSetMixin, viewsets.ModelViewSet):
         return self.retrieve(request, [], **kwargs)
 
     @action(detail=True, methods=['POST'])
+    def meta_value(self, request, **kwargs):
+        order = self.get_object()
+        data = request.data or {}
+        if 'meta_key' not in data:
+            return Response(
+                {'detail': 'The meta_key field is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Retrieve value for specified metadata key
+        meta_key = str(data['meta_key']).strip()
+        meta_data = order.meta_data or {}
+        val = meta_data.get(meta_key)
+        return Response({'key': meta_key, 'value': val})
+
+    @action(detail=True, methods=['POST'])
     def mark_pending(self, request, **kwargs):
         order = self.get_object()
 
