@@ -544,6 +544,21 @@ class EventOrderViewSet(OrderViewSetMixin, viewsets.ModelViewSet):
         return self.retrieve(request, [], **kwargs)
 
     @action(detail=True, methods=['POST'])
+    def validate_position(self, request, **kwargs):
+        order = self.get_object()
+        data = request.data or {}
+        if 'position_id' not in data:
+            return Response(
+                {'detail': 'The position_id field is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Retrieve referenced order position
+        pos_id = data['position_id']
+        has_pos = order.positions.filter(pk=pos_id).exists()
+        return Response({'valid': has_pos, 'position_id': pos_id})
+
+    @action(detail=True, methods=['POST'])
     def mark_pending(self, request, **kwargs):
         order = self.get_object()
 
